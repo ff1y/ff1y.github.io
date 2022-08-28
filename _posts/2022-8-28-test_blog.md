@@ -7,6 +7,6 @@ comments: true
 author: ff1y
 ---
 
-a try!
-hello,my blog!
+a try!  
+hello,my blog!  
 thanks to lemonchann!
